@@ -114,27 +114,79 @@ def update_claude_md(data):
     CLAUDE_MD.write_text(content, encoding="utf-8")
     return True
 
-def run_job_search(query, location):
+def run_job_search(query="", location="", remote="all", jobage="all", page=1, limit=15, language="all", seniority="all"):
     cli_path = BASE_DIR / ".agents" / "skills" / "linkedin-search" / "cli" / "src" / "cli.ts"
     if not cli_path.exists():
         return {"error": "Herramienta de búsqueda CLI no encontrada"}
         
+    loc_str = location.strip() if location and location.strip().lower() not in ["all", "todas", "cualquiera", "worldwide"] else "Worldwide"
+    q_str = query.strip() if query else "Software"
+
     cmd = [
         "bun", "run", str(cli_path),
         "search",
-        "-q", query,
-        "-l", location if location else "Remote",
-        "-n", "6"
+        "-q", q_str,
+        "-l", loc_str,
+        "-n", str(limit)
     ]
-    
+
+    if remote in ["remote", "hybrid", "onsite"]:
+        cmd.extend(["--remote", remote])
+
+    if jobage in ["1", "7", "14", "30"]:
+        cmd.extend(["--jobage", jobage])
+
+    if page and int(page) > 1:
+        cmd.extend(["--page", str(page)])
+
     try:
         res = subprocess.run(cmd, cwd=BASE_DIR, capture_output=True, timeout=15)
         stdout_str = res.stdout.decode('utf-8', errors='replace')
         stderr_str = res.stderr.decode('utf-8', errors='replace')
-        if res.returncode == 0:
-            return json.loads(stdout_str)
+        if res.returncode == 0 and stdout_str.strip():
+            raw_data = json.loads(stdout_str)
+            results = raw_data.get("results", [])
+
+            # Apply secondary filtering for Seniority if requested
+            if seniority and seniority != "all":
+                sen_lower = seniority.lower()
+                filtered = []
+                for r in results:
+                    t_lower = (r.get("title", "") + " " + r.get("location", "")).lower()
+                    if sen_lower == "junior" and any(k in t_lower for k in ["junior", "jr", "trainee", "graduate", "entry"]):
+                        filtered.append(r)
+                    elif sen_lower == "senior" and "senior" in t_lower or "sr" in t_lower:
+                        filtered.append(r)
+                    elif sen_lower == "lead" and any(k in t_lower for k in ["lead", "architect", "principal", "head", "manager"]):
+                        filtered.append(r)
+                    elif sen_lower == "mid" and not any(k in t_lower for k in ["junior", "jr", "senior", "sr", "lead", "architect"]):
+                        filtered.append(r)
+                results = filtered
+
+            # Apply secondary filtering for Language if requested
+            if language and language != "all":
+                lang_lower = language.lower()
+                filtered = []
+                for r in results:
+                    t_lower = (r.get("title", "") + " " + r.get("location", "")).lower()
+                    is_spanish = any(k in t_lower for k in ["desarrollador", "docente", "profesor", "técnico", "soporte", "perú", "peru", "chile", "colombia", "españa", "méxico", "remoto", "prácticas"])
+                    if lang_lower == "es" and is_spanish:
+                        filtered.append(r)
+                    elif lang_lower == "en" and not is_spanish:
+                        filtered.append(r)
+                results = filtered
+
+            return {
+                "meta": {
+                    "count": len(results),
+                    "page": int(page),
+                    "query": q_str,
+                    "location": loc_str
+                },
+                "results": results
+            }
         else:
-            return {"error": stderr_str}
+            return {"error": stderr_str if stderr_str else "No se recibieron datos de la CLI."}
     except Exception as e:
         return {"error": str(e)}
 
@@ -608,9 +660,15 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             data = {}
             
         if path == "/api/search":
-            q = data.get("query", "Software Engineer")
-            loc = data.get("location", "Remote")
-            res = run_job_search(q, loc)
+            q = data.get("query", "Python")
+            loc = data.get("location", "Worldwide")
+            rem = data.get("remote", "all")
+            jage = data.get("jobage", "all")
+            pg = data.get("page", 1)
+            lim = data.get("limit", 15)
+            lang = data.get("language", "all")
+            sen = data.get("seniority", "all")
+            res = run_job_search(query=q, location=loc, remote=rem, jobage=jage, page=pg, limit=lim, language=lang, seniority=sen)
             self.send_json(res)
             return
             

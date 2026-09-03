@@ -137,6 +137,15 @@
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6); }
 
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--panel-border);
+      color: white; font-family: 'Inter', sans-serif; font-weight: 500;
+      font-size: 0.85rem; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
     .job-card {
       background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border);
       border-radius: 12px; padding: 1rem; margin-bottom: 1rem; transition: all 0.2s ease;
@@ -161,6 +170,12 @@
     }
     .score-val { position: relative; z-index: 10; font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; }
 
+    .pagination-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(15, 23, 42, 0.7); border: 1px solid var(--panel-border);
+      border-radius: 12px; padding: 0.85rem 1.25rem; margin-top: 1rem;
+    }
+
     footer { text-align: center; padding: 1.25rem; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--panel-border); margin-top: auto; }
   </style>
 </head>
@@ -176,7 +191,7 @@
     </div>
 
     <nav>
-      <button class="nav-btn active" onclick="showTab('search', event)">🔍 Buscador en Vivo</button>
+      <button class="nav-btn active" onclick="showTab('search', event)">🔍 Buscador Avanzado</button>
       <button class="nav-btn" onclick="showTab('profile', event)">👤 Perfil Real (`CLAUDE.md`)</button>
       <button class="nav-btn" onclick="showTab('fit', event)">🎯 Evaluador de Calce</button>
       <button class="nav-btn" onclick="showTab('documents', event)">📝 Compilador PDF (LaTeX)</button>
@@ -191,22 +206,102 @@
     <!-- TAB 1: BUSCADOR EN VIVO -->
     <div id="tab-search" class="tab-content active">
       <div class="card" style="margin-bottom: 1.5rem;">
-        <div class="card-title">🔍 Búsqueda de Vacantes en Tiempo Real (LinkedIn Scraper CLI)</div>
-        <div style="display: flex; gap: 1rem;">
-          <input type="text" id="search-query" value="Python Developer" placeholder="Puesto / Tecnología (ej. Python, Full Stack, AI)">
-          <input type="text" id="search-loc" value="Remote" placeholder="Ubicación (ej. Remote, Lima, Peru)">
-          <button class="btn-primary" style="width: 220px;" onclick="runRealSearch()">🚀 Buscar en Vivo</button>
+        <div class="card-title">🔍 Búsqueda de Vacantes Avanzada & Filtros Multisectoriales (LinkedIn Scraper CLI)</div>
+        
+        <div class="grid-3" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label>1. Puesto / Tecnología / Habilidad</label>
+            <input type="text" id="search-query" value="Python" placeholder="ej. Python, Full Stack, Docente, UX">
+          </div>
+
+          <div class="form-group">
+            <label>2. Zona Geográfica / País / Ciudad</label>
+            <select id="search-loc-preset" onchange="toggleCustomLoc()">
+              <option value="Worldwide">🌎 Todas las zonas (Worldwide)</option>
+              <option value="Peru">🇵🇪 Perú (Lima, Arequipa, etc.)</option>
+              <option value="Latin America">🇲🇽 América Latina (LATAM)</option>
+              <option value="United States">🇺🇸 Estados Unidos / Remote USA</option>
+              <option value="Europe">🇪🇺 Europa</option>
+              <option value="custom">✏️ Personalizado (Escribir abajo)</option>
+            </select>
+            <input type="text" id="search-loc-custom" placeholder="ej. Madrid, Spain / Santiago, Chile" style="display:none; margin-top: 0.4rem;">
+          </div>
+
+          <div class="form-group">
+            <label>3. Modalidad de Trabajo</label>
+            <select id="search-remote">
+              <option value="all">🌐 Todas las modalidades</option>
+              <option value="remote">🏠 Remoto 100%</option>
+              <option value="hybrid">🔀 Híbrido</option>
+              <option value="onsite">🏢 Presencial (On-site)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label>4. Antigüedad de Publicación</label>
+            <select id="search-jobage">
+              <option value="all">📅 Cualquier fecha</option>
+              <option value="1">⏱️ Últimas 24 horas (Hoy)</option>
+              <option value="7">📆 Últimos 7 días</option>
+              <option value="14">📆 Últimos 14 días</option>
+              <option value="30">🗓️ Último mes (30 días)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>5. Nivel de Experiencia / Seniority</label>
+            <select id="search-seniority">
+              <option value="all">👔 Todos los niveles</option>
+              <option value="junior">🌱 Junior / Trainee</option>
+              <option value="mid">🚀 Mid-Level</option>
+              <option value="senior">⭐ Senior</option>
+              <option value="lead">👑 Lead / Architect / Manager</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>6. Idioma de la Publicación</label>
+            <select id="search-lang">
+              <option value="all">🗣️ Todos los idiomas</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="en">🇬🇧 Inglés</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Resultados por página:
+            <select id="search-limit" style="width: auto; display: inline-block; padding: 0.3rem 0.6rem; margin-left: 0.4rem;">
+              <option value="10">10 resultados</option>
+              <option value="15" selected>15 resultados</option>
+              <option value="20">20 resultados</option>
+              <option value="25">25 resultados</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" style="width: 260px;" onclick="runRealSearch(1)">🚀 Buscar con Filtros</button>
         </div>
       </div>
 
       <div id="search-status" style="display: none; color: var(--accent-cyan); font-weight: 500; margin-bottom: 1rem;">
-        ⏳ Ejecutando CLI de búsqueda en tiempo real... Por favor espere.
+        ⏳ Obteniendo vacantes en tiempo real con CLI... Por favor espere.
       </div>
+
+      <div id="search-meta-bar" style="display:none; margin-bottom: 1rem; color: #6ee7b7; font-weight: 600; font-size: 0.9rem;"></div>
 
       <div id="search-results">
         <div class="card" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-          Haz clic en <strong>"Buscar en Vivo"</strong> para ejecutar la herramienta de raspado CLI (`linkedin-search`) y obtener ofertas reales.
+          Configure sus filtros y haga clic en <strong>"Buscar con Filtros"</strong> para obtener las ofertas correspondientes.
         </div>
+      </div>
+
+      <div id="pagination-controls" class="pagination-bar" style="display: none;">
+        <button class="btn-secondary" id="btn-prev-page" onclick="changePage(-1)">⬅️ Página Anterior</button>
+        <span style="font-weight: 600; font-size: 0.9rem; color: #fff;">Página <span id="lbl-current-page" style="color: var(--accent-cyan);">1</span></span>
+        <button class="btn-secondary" id="btn-next-page" onclick="changePage(1)">Página Siguiente ➡️</button>
       </div>
     </div>
 
@@ -299,14 +394,14 @@
           <div class="card-title">📝 Editor de Código LaTeX (`cv/main_example.tex`)</div>
           <textarea class="code-editor" id="tex-code-editor"></textarea>
           <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-            <button class="btn-primary" onclick="compileLaTeX()">⚡ Compilar PDF con LuaLaTeX (Real)</button>
+            <button class="btn-primary" onclick="compileLaTeX()">⚡ Compilar PDF con pdflatex (Real)</button>
           </div>
         </div>
 
         <div class="card">
           <div class="card-title">📄 Vista Previa de Documento Compilado (PDF Real)</div>
           <div id="pdf-preview-box" style="height: 380px; background: #0f172a; border-radius: 8px; display: grid; place-items: center; color: var(--text-muted);">
-            Haz clic en <strong>"Compilar PDF con LuaLaTeX"</strong> para generar e incrustar el PDF en vivo.
+            Haz clic en <strong>"Compilar PDF con pdflatex"</strong> para generar e incrustar el PDF en vivo.
           </div>
         </div>
       </div>
@@ -319,6 +414,7 @@
         <div style="display: flex; gap: 1rem;">
           <input type="text" id="salary-company-input" value="Tecsup" placeholder="Nombre de Empresa (ej. Tecsup, Google, BairesDev, UCV)">
           <select id="salary-market-type" style="width: 280px;">
+            <option value="auto">Detección Automática de Sector</option>
             <option value="educacion">Sector Educación / Docencia Perú</option>
             <option value="software_peru">Sector TI & Software Perú</option>
             <option value="remoto_usa">Empresas Globales / Remoto USD</option>
@@ -355,9 +451,21 @@
   </footer>
 
   <script>
+    let currentPage = 1;
+
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function toggleCustomLoc() {
+      const preset = document.getElementById('search-loc-preset').value;
+      const customInput = document.getElementById('search-loc-custom');
+      if (preset === 'custom') {
+        customInput.style.display = 'block';
+      } else {
+        customInput.style.display = 'none';
+      }
     }
 
     function showTab(tabId, ev) {
@@ -381,32 +489,57 @@
       if (tabId === 'interview') generateInterview();
     }
 
-    async function runRealSearch() {
+    async function runRealSearch(page = 1) {
+      currentPage = page;
       const q = document.getElementById('search-query').value;
-      const loc = document.getElementById('search-loc').value;
+      const presetLoc = document.getElementById('search-loc-preset').value;
+      const customLoc = document.getElementById('search-loc-custom').value;
+      const loc = presetLoc === 'custom' ? customLoc : presetLoc;
+
+      const remote = document.getElementById('search-remote').value;
+      const jobage = document.getElementById('search-jobage').value;
+      const seniority = document.getElementById('search-seniority').value;
+      const lang = document.getElementById('search-lang').value;
+      const limit = parseInt(document.getElementById('search-limit').value);
+
       const statusDiv = document.getElementById('search-status');
       const resultsDiv = document.getElementById('search-results');
+      const metaBar = document.getElementById('search-meta-bar');
+      const pagControls = document.getElementById('pagination-controls');
 
       statusDiv.style.display = 'block';
       resultsDiv.innerHTML = '';
+      metaBar.style.display = 'none';
 
       try {
         const res = await fetch('/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: q, location: loc })
+          body: JSON.stringify({ 
+            query: q, 
+            location: loc, 
+            remote: remote,
+            jobage: jobage,
+            seniority: seniority,
+            language: lang,
+            page: currentPage,
+            limit: limit
+          })
         });
         const data = await res.json();
         statusDiv.style.display = 'none';
 
         if (data.results && data.results.length > 0) {
+          metaBar.style.display = 'block';
+          metaBar.innerHTML = `✅ Se encontraron <strong>${data.results.length}</strong> vacantes en la página ${currentPage} para <em>"${escapeHtml(q)}"</em> (${escapeHtml(loc)})`;
+          
           resultsDiv.innerHTML = data.results.map(job => `
             <div class="job-card">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                   <h3 style="color: #fff; font-size: 1.1rem; font-family: 'Outfit', sans-serif;">${escapeHtml(job.title)}</h3>
                   <div style="color: var(--accent-cyan); font-size: 0.9rem; font-weight: 600; margin-top: 0.2rem;">🏢 ${escapeHtml(job.company)}</div>
-                  <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">📍 ${escapeHtml(job.location)}</div>
+                  <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">📍 ${escapeHtml(job.location)} ${job.date ? '| 📅 Publicado: ' + job.date : ''}</div>
                 </div>
                 <button class="btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.8rem; width: auto;" 
                   onclick="selectJobForEval('${job.id}', '${escapeHtml(job.title)}', '${escapeHtml(job.company)}')">
@@ -415,14 +548,28 @@
               </div>
             </div>
           `).join('');
+
+          pagControls.style.display = 'flex';
+          document.getElementById('lbl-current-page').innerText = currentPage;
+          document.getElementById('btn-prev-page').disabled = currentPage <= 1;
         } else if (data.error) {
-          resultsDiv.innerHTML = `<div class="card" style="color: #ef4444;">Error en la herramienta CLI: ${data.error}</div>`;
+          resultsDiv.innerHTML = `<div class="card" style="color: #ef4444;">Error en la búsqueda: ${data.error}</div>`;
+          pagControls.style.display = 'none';
         } else {
-          resultsDiv.innerHTML = `<div class="card" style="color: var(--text-muted);">No se encontraron ofertas. Intente con otra palabra clave o ubicación.</div>`;
+          resultsDiv.innerHTML = `<div class="card" style="text-align: center; padding: 2rem; color: var(--text-muted);">No se encontraron ofertas con los filtros seleccionados. Intente ajustar los criterios.</div>`;
+          pagControls.style.display = 'none';
         }
       } catch (e) {
         statusDiv.style.display = 'none';
         resultsDiv.innerHTML = `<div class="card" style="color: #ef4444;">Error al conectar con el servidor: ${e.message}</div>`;
+        pagControls.style.display = 'none';
+      }
+    }
+
+    function changePage(delta) {
+      const newPage = currentPage + delta;
+      if (newPage >= 1) {
+        runRealSearch(newPage);
       }
     }
 
@@ -528,7 +675,7 @@
       const code = document.getElementById('tex-code-editor').value;
       const previewBox = document.getElementById('pdf-preview-box');
 
-      previewBox.innerHTML = `<div style="color: var(--accent-cyan);">⏳ Compilando documento con LuaLaTeX... Por favor espere.</div>`;
+      previewBox.innerHTML = `<div style="color: var(--accent-cyan);">⏳ Compilando documento con pdflatex... Por favor espere.</div>`;
 
       try {
         const res = await fetch('/api/compile_tex', {
@@ -577,7 +724,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <h2 style="color: #fff; font-family: 'Outfit', sans-serif;">🏢 ${data.company}</h2>
-                  <div style="color: var(--text-muted); font-size: 0.85rem;">📍 Ubicación Mercado: ${data.city} | Sector: ${data.dept_name}</div>
+                  <div style="color: var(--text-muted); font-size: 0.85rem;">📍 Ubicación Mercado: ${data.city} | Sector: ${data.sector_name}</div>
                 </div>
                 <span class="tag green" style="font-size: 0.9rem; padding: 0.4rem 1rem;">${data.diff_str}</span>
               </div>
