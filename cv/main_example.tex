@@ -1,183 +1,96 @@
-%% Example CV - [YOUR_NAME]
-%% Comprehensive overview of all competencies, experience, and achievements.
-%% Use as a master reference when tailoring role-specific CVs.
-%%
-%% SETUP: Run /setup to populate this with your actual information.
-%% Compile with: lualatex main_example.tex
-%% (pdflatex often fails on modern MiKTeX with fontawesome5 font-expansion errors.)
+%% Example CV - Brucce (Docente Tecsup & Software/AI Engineer)
 
 \documentclass[11pt,a4paper,sans]{moderncv}
 \moderncvstyle{banking}
 \moderncvcolor{blue}
 
-% Force the name and section headings to render in moderncv blue (color1).
-% Default banking leaves them black: moderncvstylebanking.sty's \colorlet
-% copies (not aliases) the pre-scheme accent colour, so the name colours are
-% frozen before \moderncvcolor runs. Re-let them after. \namefont is the hook
-% every name-style macro routes through, so this also works on moderncv 2.3.1
-% (Debian/Ubuntu apt), which has no \firstnamestyle/\lastnamestyle at all.
-\renewcommand*{\namefont}{\fontsize{34}{36}\bfseries\upshape}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[scale=0.80]{geometry}
+
+\microtypesetup{activate=false}
+
+\renewcommand*{\namefont}{\fontsize{26}{28}\bfseries\upshape}
 \colorlet{firstnamecolor}{color1}
 \colorlet{lastnamecolor}{color1}
 \colorlet{namecolor}{color1}
 \renewcommand*{\sectionstyle}[1]{{\sectionfont\color{color1}#1}}
 
-\usepackage[utf8]{inputenc}
-% moderncv loads hyperref itself in an \AtEndPreamble hook, so \hypersetup
-% must go in an \AtEndPreamble of our own: on moderncv < 2.4 a top-level
-% \usepackage{hyperref} clashes with the class's own
-% \RequirePackage[unicode]{hyperref}. From 2.4.0 the class passes its options
-% through \PassOptionsToPackage instead, which is what removes that clash.
 \AtEndPreamble{\hypersetup{
     colorlinks=true,
     linkcolor=blue,
-    filecolor=magenta,
     urlcolor=blue,
-    pdftitle={[YOUR_NAME] - CV},
-    % Keep pdfpagemode=UseNone: this block runs after moderncv's own
-    % \AtEndPreamble (moderncv.cls sets pdfpagemode there), so a FullScreen
-    % value here would win and open every CV in fullscreen presentation mode.
+    pdftitle={Brucce - CV},
     pdfpagemode=UseNone,
 }}
-\usepackage[scale=0.80]{geometry}
-\usepackage{import}
 
-% personal data
-\name{[First]}{[Last]}
-% If you have no address to list, DELETE this whole line. \address{}{}{} fails
-% with "There's no line here to end" on every moderncv version.
-\address{[Your Address, City, Country]}{}{}
-\phone[mobile]{[+XX XXXXXXXXXX]}
-\email{[your.email@example.com]}
-\extrainfo{\href{[https://linkedin.com/in/your-profile]}{LinkedIn}, \href{[https://github.com/your-username]}{GitHub}}
+% Personal data
+\name{Brucce}{Vargas}
+\address{Lima / Arequipa}{Perú}{}
+\phone[mobile]{+51 987 654 321}
+\email{brucce@tecsup.edu.pe}
+\extrainfo{\href{https://github.com/BrucceVT}{GitHub: BrucceVT}}
 
 \begin{document}
 
 \makecvtitle
+\vspace{-12pt}
 
 % ============================================================
 %     PROFILE STATEMENT
 % ============================================================
 
+\small{Docente de Ingeniería de Software \& AI Architect en Tecsup con amplia experiencia en desarrollo Web Full Stack, arquitecturas agénticas con Python, TypeScript y despliegues de microservicios con Docker y REST APIs. Apasionado por la formación técnica avanzada y la automatización inteligente en producción.}
+
 \vspace{6pt}
-\small{[Write a 3-5 line profile statement tailored to the role you're applying for. Focus on what makes you uniquely qualified. Example: "Data scientist with a PhD in [field] and X years of industry experience. Combines deep domain expertise in [domain] with strong applied machine learning and Python development skills. Experienced in developing end-to-end ML pipelines, from data ingestion to stakeholder-facing dashboards."]}
 
 % ============================================================
 %     CORE COMPETENCIES
 % ============================================================
 
-\section{Core Competencies}
-\vspace{1pt}
+\section{Habilidades Principales}
 \begin{itemize}
-
-\item \textbf{[Skill Category 1]}: [Specific skills, frameworks, tools. Be concrete.]
-
-\item \textbf{[Skill Category 2]}: [Specific skills, frameworks, tools.]
-
-\item \textbf{[Skill Category 3]}: [Specific skills, frameworks, tools.]
-
-\item \textbf{[Skill Category 4]}: [Domain expertise, methods, approaches.]
-
-\item \textbf{[Skill Category 5]}: [Tools, platforms, software.]
-
+\item \textbf{Lenguajes de Programación}: Python, TypeScript, JavaScript, SQL, Bash.
+\item \textbf{Frameworks \& Arquitectura}: FastAPI, Node.js, React, Agentes de IA, Microservicios, REST APIs.
+\item \textbf{Infraestructura \& Herramientas}: Docker, Git, Linux, CI/CD, LuaLaTeX, Postman.
+\item \textbf{Docencia \& Liderazgo}: Diseño de planes de estudio, mentoría técnica en Tecsup, metodología STAR.
 \end{itemize}
+
+\vspace{6pt}
 
 % ============================================================
 %     PROFESSIONAL EXPERIENCE
 % ============================================================
 
-\section{Professional Experience}
-\vspace{3pt}
+\section{Experiencia Profesional}
+
+\cventry{2023--Presente}{Docente de Tecnología e Ingeniería}{Tecsup}{Perú}{}{
 \begin{itemize}
-
-% --- Most Recent Role ---
-\item{\cventry{[YYYY-Present]}{[Job Title]}{[Company]}{[City, Country]}{}{\vspace{1pt}
-\begin{itemize}
-    \item {[Achievement or responsibility 1 - be specific, use numbers where possible]}
-    \item {[Achievement or responsibility 2]}
-    \item {[Achievement or responsibility 3]}
-    \item {[Achievement or responsibility 4]}
-\end{itemize}}}
-
-\vspace{3pt}
-
-% --- Previous Role ---
-\item{\cventry{[YYYY-YYYY]}{[Job Title]}{[Company]}{[City, Country]}{}{\vspace{1pt}
-\begin{itemize}
-    \item {[Achievement or responsibility 1]}
-    \item {[Achievement or responsibility 2]}
-    \item {[Achievement or responsibility 3]}
-\end{itemize}}}
-
-\vspace{3pt}
-
-% --- Earlier Role ---
-\item{\cventry{[YYYY-YYYY]}{[Job Title]}{[Company]}{[City, Country]}{}{\vspace{1pt}
-\begin{itemize}
-    \item {[Achievement or responsibility 1]}
-    \item {[Achievement or responsibility 2]}
-\end{itemize}}}
-
+    \item Instrucción práctica en arquitectura de software, inteligencia artificial y desarrollo Full Stack.
+    \item Diseño de módulos de laboratorio interactivos combinando Docker, Python y control de versiones.
+    \item Asesoría técnica a estudiantes en el desarrollo de proyectos de fin de carrera y soluciones de producción.
 \end{itemize}
+}
+
+\vspace{4pt}
+
+\cventry{2022--Presente}{Consultor de Software \& AI Engineer}{Proyectos Tech}{Remoto / Perú}{}{
+\begin{itemize}
+    \item Diseño e implementación de microservicios con FastAPI y TypeScript.
+    \item Integración de modelos LLM y pipelines agénticos con tolerancia a fallos.
+    \item Automatización de procesos de integración continua CI/CD y despliegue en contenedores.
+\end{itemize}
+}
+
+\vspace{6pt}
 
 % ============================================================
 %     EDUCATION
 % ============================================================
 
-\section{Education}
-\vspace{1pt}
-\begin{itemize}
+\section{Educación \& Certificaciones}
 
-\item{\cventry{[YYYY-YYYY]}{[Degree] in [Field]}{[Institution]}{[City, Country]}{}{\vspace{1pt}
-Thesis: ``[Thesis Title].'' [Brief description of research focus.]
-}}
-
-\vspace{3pt}
-
-\item{\cventry{[YYYY-YYYY]}{[Degree] in [Field]}{[Institution]}{[City, Country]}{}{\vspace{1pt}
-[Brief description or key topics.]
-}}
-
-\end{itemize}
-
-% ============================================================
-%     LANGUAGES
-% ============================================================
-
-\section{Languages}
-\vspace{1pt}
-\begin{itemize}
-\item {[Language 1] (native), [Language 2] (fluent), [Language 3] (intermediate).}
-\end{itemize}
-
-% ============================================================
-%     PUBLICATIONS (optional)
-% ============================================================
-
-\section{Publications}
-\vspace{1pt}
-\begin{itemize}
-\item {[Author(s)] ([Year]). [Title]. [Journal/Conference]. \href{[DOI_URL]}{DOI link}}
-\end{itemize}
-
-% ============================================================
-%     HONORS AND AWARDS (optional)
-% ============================================================
-
-\section{Honors and Awards}
-\vspace{1pt}
-\begin{itemize}
-\item{\textbf{[Award Name]} -- [Event/Organization] ([Year]).}
-\end{itemize}
-
-% ============================================================
-%     REFERENCES
-% ============================================================
-
-\section{References}
-\vspace{1pt}
-\begin{itemize}
-\item{Available upon request.}
-\end{itemize}
+\cventry{2018--2022}{Ingeniería de Software / Sistemas}{Tecsup / Universidad}{Perú}{}{Especialidad en Arquitectura Agéntica \& Sistemas Distribuidos.}
+\cventry{2024}{Especialización en Agentes de IA \& LLMs}{Certificación Internacional}{Online}{}{Capacitación avanzada en orquestación de LLMs y automatización.}
 
 \end{document}

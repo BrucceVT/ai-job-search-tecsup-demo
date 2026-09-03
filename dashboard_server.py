@@ -18,7 +18,7 @@ CLAUDE_MD = BASE_DIR / "CLAUDE.md"
 CV_DIR = BASE_DIR / "cv"
 CV_FILE = CV_DIR / "main_example.tex"
 COVER_FILE = BASE_DIR / "cover_letters" / "cover_example.tex"
-LUALATEX_BIN = Path(r"C:\Users\Usuario\AppData\Local\Programs\MiKTeX\miktex\bin\x64\lualatex.exe")
+PDFLATEX_BIN = Path(r"C:\Users\Usuario\AppData\Local\Programs\MiKTeX\miktex\bin\x64\pdflatex.exe")
 
 # Common Spanish & English stopwords to ignore during keyword extraction
 STOPWORDS = set([
@@ -536,19 +536,19 @@ def compile_latex(tex_code, filename="main_example.tex"):
     target_tex = CV_DIR / filename
     target_tex.write_text(tex_code, encoding="utf-8")
     
-    if not LUALATEX_BIN.exists():
-        return {"error": "LuaLaTeX no está en la ruta especificada"}
+    if not PDFLATEX_BIN.exists():
+        return {"error": "pdflatex no está en la ruta especificada"}
         
     cmd = [
-        str(LUALATEX_BIN),
+        str(PDFLATEX_BIN),
         "-interaction=nonstopmode",
-        "--miktex-disable-installer",
+        "-enable-installer",
         f"-output-directory={CV_DIR}",
         str(target_tex)
     ]
     
     try:
-        res = subprocess.run(cmd, cwd=BASE_DIR, capture_output=True, timeout=12)
+        res = subprocess.run(cmd, cwd=BASE_DIR, capture_output=True, timeout=20)
         stdout_str = res.stdout.decode('utf-8', errors='replace')
         stderr_str = res.stderr.decode('utf-8', errors='replace')
         pdf_file = CV_DIR / filename.replace(".tex", ".pdf")
