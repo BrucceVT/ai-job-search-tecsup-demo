@@ -1,8 +1,10 @@
-<p align="center">
-  <img src="assets/mascot/pip_flight_loop.gif" alt="Pip, the courier bird" width="200">
-</p>
+> [!IMPORTANT]
+> **Aviso de Demostración Docente (Tecsup) / Fork del Repositorio Original**:
+> Este repositorio es una **copia modificada / fork** del proyecto original [`MadsLorentzen/ai-job-search`](https://github.com/MadsLorentzen/ai-job-search).
+> Incluye una **interfaz gráfica web interactiva de prueba** (`web_dashboard.html` / `dashboard_server.py`) desarrollada para uso didáctico en clases de **Tecsup**.
+> ⚠️ **Aviso de Funcionalidad**: Esta versión es un prototipo de demostración académica, por lo que **no es funcional al 100% en todas sus características de producción**.
 
-# AI Job Search
+# AI Job Search (Versión de Prueba Tecsup)
 
 *The job search that runs on your machine.*
 

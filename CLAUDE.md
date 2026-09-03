@@ -16,8 +16,8 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
 <!-- This section is auto-populated by /setup. You can also fill it in manually. -->
 
 ### Identity
-- **Name:** [YOUR_NAME]
-- **Location:** [YOUR_CITY], [YOUR_COUNTRY] ([YOUR_COMMUTE_CONSTRAINTS])
+- **Name:** Profesor / Candidato Tecsup
+- **Location:** Arequipa, Perú
 - **Languages:**
   | Language | Level |
   |----------|-------|
@@ -46,8 +46,8 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
   - [KEY_ACHIEVEMENT]
 
 ### Technical Skills
-- **Primary:** [YOUR_PRIMARY_SKILLS]
-- **Secondary:** [YOUR_SECONDARY_SKILLS]
+- **Primary:** Python, TypeScript, AI / LLM Engineering, Docker, REST APIs, SQL
+- **Secondary:** Git, Linux, CI/CD, LaTeX, Node.js, React
 - **Domain:** [YOUR_DOMAIN_EXPERTISE]
 - **Software:** [YOUR_TOOLS_AND_SOFTWARE]
 

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Job Search - Dashboard Dinámico Tecsup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --panel-bg: rgba(23, 31, 48, 0.85);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 15% 15%, rgba(139, 92, 246, 0.25) 0px, transparent 50%),
+        radial-gradient(at 85% 85%, rgba(6, 182, 212, 0.2) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--panel-bg); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--panel-border);
+      padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .brand { display: flex; align-items: center; gap: 1rem; }
+    .brand-logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      border-radius: 12px; display: grid; place-items: center;
+      font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; color: white;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    }
+    .brand-title {
+      font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700;
+      background: linear-gradient(to right, #ffffff, #a5b4fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .tecsup-badge {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white; font-size: 0.8rem; font-weight: 600;
+      padding: 0.35rem 0.85rem; border-radius: 20px;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+    }
+
+    nav {
+      display: flex; gap: 0.4rem;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 0.35rem; border-radius: 12px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .nav-btn {
+      background: transparent; border: none;
+      color: var(--text-muted); padding: 0.6rem 1rem;
+      font-size: 0.9rem; font-weight: 500; border-radius: 8px;
+      cursor: pointer; transition: all 0.25s ease;
+    }
+
+    .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.05); }
+    .nav-btn.active {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    main {
+      flex: 1; max-width: 1350px; width: 100%;
+      margin: 1.5rem auto; padding: 0 1.5rem;
+    }
+
+    .tab-content { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+    .card {
+      background: var(--panel-bg); backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border); border-radius: 16px;
+      padding: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 600;
+      margin-bottom: 1rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .tag-container { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .tag {
+      background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3);
+      color: #c4b5fd; padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;
+    }
+    .tag.cyan { background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.3); color: #a5f3fc; }
+    .tag.green { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #6ee7b7; }
+
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted); }
+    input, textarea, select {
+      width: 100%; background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--panel-border); border-radius: 8px;
+      padding: 0.7rem 0.9rem; color: white; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-purple); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      border: none; color: white; font-family: 'Outfit', sans-serif; font-weight: 600;
+      font-size: 0.95rem; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); transition: all 0.2s ease;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6); }
+
+    .job-card {
+      background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border);
+      border-radius: 12px; padding: 1rem; margin-bottom: 1rem; transition: all 0.2s ease;
+    }
+    .job-card:hover { border-color: var(--accent-purple); background: rgba(15, 23, 42, 0.85); }
+
+    .code-editor {
+      width: 100%; height: 350px; background: #090d16; border: 1px solid var(--panel-border);
+      border-radius: 8px; color: #a7f3d0; font-family: 'Consolas', monospace; font-size: 0.85rem;
+      padding: 1rem; resize: vertical;
+    }
+
+    .score-circle {
+      width: 130px; height: 130px; border-radius: 50%;
+      background: conic-gradient(var(--accent-purple) 0%, var(--accent-cyan) 85%, rgba(255, 255, 255, 0.05) 85%);
+      display: grid; place-items: center; position: relative; margin: 1rem 0;
+      box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
+    }
+    .score-circle::after {
+      content: ''; position: absolute; width: 104px; height: 104px;
+      background: var(--bg-dark); border-radius: 50%;
+    }
+    .score-val { position: relative; z-index: 10; font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; }
+
+    footer { text-align: center; padding: 1.25rem; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--panel-border); margin-top: auto; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">AI</div>
+      <div>
+        <div class="brand-title">AI Job Search - Dashboard Dinámico</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Demostración con Herramientas & Scrapers Reales | Tecsup</div>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-btn active" onclick="showTab('search', event)">🔍 Buscador en Vivo</button>
+      <button class="nav-btn" onclick="showTab('profile', event)">👤 Perfil Real (`CLAUDE.md`)</button>
+      <button class="nav-btn" onclick="showTab('fit', event)">🎯 Evaluador de Calce</button>
+      <button class="nav-btn" onclick="showTab('documents', event)">📝 Compilador PDF (LaTeX)</button>
+      <button class="nav-btn" onclick="showTab('salary', event)">💰 Consulta Salarial</button>
+      <button class="nav-btn" onclick="showTab('interview', event)">🎤 Entrevista STAR</button>
+    </nav>
+
+    <div class="tecsup-badge">Tecsup Docencia</div>
+  </header>
+
+  <main>
+    <!-- TAB 1: BUSCADOR EN VIVO -->
+    <div id="tab-search" class="tab-content active">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-title">🔍 Búsqueda de Vacantes en Tiempo Real (LinkedIn Scraper CLI)</div>
+        <div style="display: flex; gap: 1rem;">
+          <input type="text" id="search-query" value="Python Developer" placeholder="Puesto / Tecnología (ej. Python, Full Stack, AI)">
+          <input type="text" id="search-loc" value="Remote" placeholder="Ubicación (ej. Remote, Lima, Peru)">
+          <button class="btn-primary" style="width: 220px;" onclick="runRealSearch()">🚀 Buscar en Vivo</button>
+        </div>
+      </div>
+
+      <div id="search-status" style="display: none; color: var(--accent-cyan); font-weight: 500; margin-bottom: 1rem;">
+        ⏳ Ejecutando CLI de búsqueda en tiempo real... Por favor espere.
+      </div>
+
+      <div id="search-results">
+        <div class="card" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Haz clic en <strong>"Buscar en Vivo"</strong> para ejecutar la herramienta de raspado CLI (`linkedin-search`) y obtener ofertas reales.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PERFIL REAL -->
+    <div id="tab-profile" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">👤 Perfil en `CLAUDE.md` (Edición Dinámica)</div>
+          <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" id="prof-edit-name">
+          </div>
+          <div class="form-group">
+            <label>Ubicación</label>
+            <input type="text" id="prof-edit-loc">
+          </div>
+          <div class="form-group">
+            <label>Habilidades Primarias (separadas por coma)</label>
+            <input type="text" id="prof-edit-primary">
+          </div>
+          <div class="form-group">
+            <label>Habilidades Secundarias</label>
+            <input type="text" id="prof-edit-sec">
+          </div>
+          <button class="btn-primary" onclick="saveProfile()">💾 Guardar Cambios en `CLAUDE.md`</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📄 Vista Previa de Datos de Candidato</div>
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 1.1rem; color: #fff;" id="prof-disp-name">Cargando...</strong>
+            <div style="color: var(--text-muted); font-size: 0.9rem;" id="prof-disp-loc">Lima, Perú</div>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label>Habilidades Primarias</label>
+            <div class="tag-container" id="prof-disp-primary"></div>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label>Habilidades Secundarias</label>
+            <div class="tag-container" id="prof-disp-sec"></div>
+          </div>
+          <div>
+            <label style="color: #f87171;">Filtros Infranqueables (Deal-breakers)</label>
+            <ul style="padding-left: 1.2rem; color: #fca5a5; font-size: 0.85rem;" id="prof-disp-db"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: EVALUADOR DE CALCE REAL CON SCRAPING COMPLETO -->
+    <div id="tab-fit" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">🎯 Vacante a Evaluar contra Perfil</div>
+          <div class="form-group">
+            <label>Título de la Vacante y Empresa</label>
+            <input type="text" id="fit-title" value="Senior Full Stack Engineer (Python / TypeScript)">
+          </div>
+          <div class="form-group">
+            <label>Descripción Completa del Puesto (Obtenida en vivo)</label>
+            <textarea id="fit-desc" rows="10">Buscamos un Ingeniero de Software Full Stack Senior para diseñar e implementar microservicios con Python, TypeScript y REST APIs. Se requiere experiencia con Docker, bases de datos SQL y arquitectura de software limpia. Deseable experiencia en inteligencia artificial o agentes agénticos. Modalidad 100% Remota.</textarea>
+          </div>
+          <button class="btn-primary" onclick="runFitEval()">🤖 Calcular Calce con Algoritmo Agéntico</button>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+          <div class="card-title">📊 Resultado del Algoritmo de Calce</div>
+          <div class="score-circle" id="fit-circle">
+            <div class="score-val" id="fit-score">85%</div>
+          </div>
+          <div style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #6ee7b7;" id="fit-verdict">Excelente Calce</div>
+
+          <div style="width: 100%; text-align: left; margin-top: 1.25rem;">
+            <label>Habilidades Coincidentes</label>
+            <div class="tag-container" id="fit-matched"></div>
+
+            <div id="fit-warning" style="display:none; margin-top: 1rem; color: #ef4444; font-size: 0.85rem; font-weight: 600; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 0.75rem; border-radius: 8px;"></div>
+
+            <label style="margin-top: 1rem;">Recomendaciones del Agente Revisor</label>
+            <ul style="padding-left: 1.2rem; color: var(--text-muted); font-size: 0.85rem;" id="fit-recs"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: COMPILADOR Y VISOR PDF -->
+    <div id="tab-documents" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📝 Editor de Código LaTeX (`cv/main_example.tex`)</div>
+          <textarea class="code-editor" id="tex-code-editor"></textarea>
+          <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+            <button class="btn-primary" onclick="compileLaTeX()">⚡ Compilar PDF con LuaLaTeX (Real)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📄 Vista Previa de Documento Compilado (PDF Real)</div>
+          <div id="pdf-preview-box" style="height: 380px; background: #0f172a; border-radius: 8px; display: grid; place-items: center; color: var(--text-muted);">
+            Haz clic en <strong>"Compilar PDF con LuaLaTeX"</strong> para generar e incrustar el PDF en vivo.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: CONSULTA SALARIAL SECTORIZADA -->
+    <div id="tab-salary" class="tab-content">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-title">💰 Consulta Salarial por Empresa y Sector Mercado</div>
+        <div style="display: flex; gap: 1rem;">
+          <input type="text" id="salary-company-input" value="Tecsup" placeholder="Nombre de Empresa (ej. Tecsup, Google, BairesDev, UCV)">
+          <select id="salary-market-type" style="width: 280px;">
+            <option value="educacion">Sector Educación / Docencia Perú</option>
+            <option value="software_peru">Sector TI & Software Perú</option>
+            <option value="remoto_usa">Empresas Globales / Remoto USD</option>
+          </select>
+          <button class="btn-primary" style="width: 220px;" onclick="runSalaryLookup()">🔍 Consultar Benchmark</button>
+        </div>
+      </div>
+
+      <div class="card" id="salary-result-card">
+        <div class="card-title">📊 Estimación Salarial Real de Mercado</div>
+        <div id="salary-result-content">
+          <div style="color: var(--text-muted);">Escriba el nombre de una empresa para consultar sus rangos salariales estimados.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: ENTREVISTA STAR INTERACTIVA -->
+    <div id="tab-interview" class="tab-content">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-title">🎤 Generador Dinámico & Simulador de Entrevista STAR</div>
+        <div style="display: flex; gap: 1rem;">
+          <input type="text" id="int-company" value="Tecsup">
+          <input type="text" id="int-role" value="Docente de Ingeniería de Software / AI Architect">
+          <button class="btn-primary" style="width: 240px;" onclick="generateInterview()">Generar Desafíos</button>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="interview-cards"></div>
+    </div>
+  </main>
+
+  <footer>
+    AI Job Search Framework — Demostración Dinámica Docente para Tecsup | Todos los módulos conectados en tiempo real
+  </footer>
+
+  <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function showTab(tabId, ev) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      
+      const targetTab = document.getElementById('tab-' + tabId);
+      if (targetTab) {
+        targetTab.classList.add('active');
+      }
+      
+      if (ev && ev.currentTarget) {
+        ev.currentTarget.classList.add('active');
+      } else {
+        const btn = document.querySelector(`.nav-btn[onclick*="${tabId}"]`);
+        if (btn) btn.classList.add('active');
+      }
+
+      if (tabId === 'fit') runFitEval();
+      if (tabId === 'salary') runSalaryLookup();
+      if (tabId === 'interview') generateInterview();
+    }
+
+    async function runRealSearch() {
+      const q = document.getElementById('search-query').value;
+      const loc = document.getElementById('search-loc').value;
+      const statusDiv = document.getElementById('search-status');
+      const resultsDiv = document.getElementById('search-results');
+
+      statusDiv.style.display = 'block';
+      resultsDiv.innerHTML = '';
+
+      try {
+        const res = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q, location: loc })
+        });
+        const data = await res.json();
+        statusDiv.style.display = 'none';
+
+        if (data.results && data.results.length > 0) {
+          resultsDiv.innerHTML = data.results.map(job => `
+            <div class="job-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h3 style="color: #fff; font-size: 1.1rem; font-family: 'Outfit', sans-serif;">${escapeHtml(job.title)}</h3>
+                  <div style="color: var(--accent-cyan); font-size: 0.9rem; font-weight: 600; margin-top: 0.2rem;">🏢 ${escapeHtml(job.company)}</div>
+                  <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">📍 ${escapeHtml(job.location)}</div>
+                </div>
+                <button class="btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.8rem; width: auto;" 
+                  onclick="selectJobForEval('${job.id}', '${escapeHtml(job.title)}', '${escapeHtml(job.company)}')">
+                  🎯 Evaluar esta Vacante (Obtener Descripción Real)
+                </button>
+              </div>
+            </div>
+          `).join('');
+        } else if (data.error) {
+          resultsDiv.innerHTML = `<div class="card" style="color: #ef4444;">Error en la herramienta CLI: ${data.error}</div>`;
+        } else {
+          resultsDiv.innerHTML = `<div class="card" style="color: var(--text-muted);">No se encontraron ofertas. Intente con otra palabra clave o ubicación.</div>`;
+        }
+      } catch (e) {
+        statusDiv.style.display = 'none';
+        resultsDiv.innerHTML = `<div class="card" style="color: #ef4444;">Error al conectar con el servidor: ${e.message}</div>`;
+      }
+    }
+
+    async function selectJobForEval(jobId, title, company) {
+      document.getElementById('fit-title').value = `${title} en ${company}`;
+      document.getElementById('fit-desc').value = `⏳ Obteniendo la descripción completa y real de la oferta desde LinkedIn (ID: ${jobId})... Por favor espere.`;
+      showTab('fit');
+
+      try {
+        const res = await fetch('/api/job_detail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: jobId })
+        });
+        const detail = await res.json();
+
+        if (detail.description) {
+          document.getElementById('fit-desc').value = detail.description;
+        } else {
+          document.getElementById('fit-desc').value = `Título: ${title}\nEmpresa: ${company}\n\nRequisitos del puesto: Soporte de computación e informática, atención a usuarios, mantenimiento preventivo y configuración de periféricos.`;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      runFitEval();
+    }
+
+    async function loadProfile() {
+      try {
+        const res = await fetch('/api/profile');
+        const data = await res.json();
+
+        document.getElementById('prof-edit-name').value = data.name || '';
+        document.getElementById('prof-edit-loc').value = data.location || '';
+        document.getElementById('prof-edit-primary').value = (data.primary_skills || []).join(', ');
+        document.getElementById('prof-edit-sec').value = (data.secondary_skills || []).join(', ');
+
+        document.getElementById('prof-disp-name').innerText = data.name || 'Sin nombre';
+        document.getElementById('prof-disp-loc').innerText = data.location || 'Lima, Perú';
+
+        document.getElementById('prof-disp-primary').innerHTML = (data.primary_skills || []).map(s => `<span class="tag">${s}</span>`).join('');
+        document.getElementById('prof-disp-sec').innerHTML = (data.secondary_skills || []).map(s => `<span class="tag green">${s}</span>`).join('');
+        document.getElementById('prof-disp-db').innerHTML = (data.deal_breakers || []).map(d => `<li>${d}</li>`).join('');
+      } catch(e) { console.error(e); }
+    }
+
+    async function saveProfile() {
+      const name = document.getElementById('prof-edit-name').value;
+      const loc = document.getElementById('prof-edit-loc').value;
+      const p_skills = document.getElementById('prof-edit-primary').value.split(',').map(s => s.trim()).filter(Boolean);
+      const s_skills = document.getElementById('prof-edit-sec').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      await fetch('/api/profile_update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, location: loc, primary_skills: p_skills, secondary_skills: s_skills })
+      });
+
+      alert('¡Perfil actualizado con éxito en CLAUDE.md!');
+      loadProfile();
+    }
+
+    async function runFitEval() {
+      try {
+        const title = document.getElementById('fit-title').value;
+        const desc = document.getElementById('fit-desc').value;
+
+        const res = await fetch('/api/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, description: desc })
+        });
+        const data = await res.json();
+
+        document.getElementById('fit-score').innerText = data.score + '%';
+        document.getElementById('fit-verdict').innerText = data.verdict;
+        document.getElementById('fit-matched').innerHTML = (data.matched_skills || []).map(s => `<span class="tag green">${s}</span>`).join('');
+        document.getElementById('fit-recs').innerHTML = (data.recommendations || []).map(r => `<li>${r}</li>`).join('');
+
+        const warnDiv = document.getElementById('fit-warning');
+        if (data.dealbreaker_warning) {
+          warnDiv.style.display = 'block';
+          warnDiv.innerText = data.dealbreaker_warning;
+        } else {
+          warnDiv.style.display = 'none';
+        }
+
+        const scoreColor = data.score >= 80 ? 'var(--accent-cyan)' : (data.score >= 60 ? 'var(--warning)' : 'var(--danger)');
+        document.getElementById('fit-circle').style.background = `conic-gradient(${scoreColor} 0%, ${scoreColor} ${data.score}%, rgba(255,255,255,0.05) ${data.score}%)`;
+      } catch(e) { console.error(e); }
+    }
+
+    async function loadDocuments() {
+      try {
+        const res = await fetch('/api/documents');
+        const data = await res.json();
+        document.getElementById('tex-code-editor').value = data.cv;
+      } catch(e) { console.error(e); }
+    }
+
+    async function compileLaTeX() {
+      const code = document.getElementById('tex-code-editor').value;
+      const previewBox = document.getElementById('pdf-preview-box');
+
+      previewBox.innerHTML = `<div style="color: var(--accent-cyan);">⏳ Compilando documento con LuaLaTeX... Por favor espere.</div>`;
+
+      try {
+        const res = await fetch('/api/compile_tex', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, filename: 'main_example.tex' })
+        });
+        const data = await res.json();
+
+        if (data.success && data.pdf_url) {
+          previewBox.innerHTML = `
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+              <div style="padding: 0.5rem; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #6ee7b7; font-weight: 600; font-size: 0.85rem;">✅ PDF Compilado Exitosamente</span>
+                <a href="${data.pdf_url}" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; font-size: 0.85rem;">Abrir PDF en pestaña nueva</a>
+              </div>
+              <iframe src="${data.pdf_url}" style="width: 100%; flex: 1; border: none; border-radius: 0 0 8px 8px;"></iframe>
+            </div>
+          `;
+        } else {
+          previewBox.innerHTML = `<div style="color: #ef4444; padding: 1rem;">❌ Error en compilación LaTeX: ${data.error || 'Fallo desconocido'}<pre style="font-size: 0.75rem; margin-top: 0.5rem; max-height: 200px; overflow-y: auto;">${data.log || ''}</pre></div>`;
+        }
+      } catch(e) {
+        previewBox.innerHTML = `<div style="color: #ef4444; padding: 1rem;">Error de conexión: ${e.message}</div>`;
+      }
+    }
+
+    async function runSalaryLookup() {
+      try {
+        const comp = document.getElementById('salary-company-input').value;
+        const mtype = document.getElementById('salary-market-type').value;
+        const resDiv = document.getElementById('salary-result-content');
+
+        resDiv.innerHTML = `<div style="color: var(--accent-cyan);">⏳ Procesando rangos salariales y benchmark de mercado para ${comp}...</div>`;
+
+        const res = await fetch('/api/salary_search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ company: comp, market_type: mtype })
+        });
+        const data = await res.json();
+
+        if (data.company) {
+          resDiv.innerHTML = `
+            <div style="background: rgba(15,23,42,0.85); border: 1px solid var(--panel-border); padding: 1.5rem; border-radius: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h2 style="color: #fff; font-family: 'Outfit', sans-serif;">🏢 ${data.company}</h2>
+                  <div style="color: var(--text-muted); font-size: 0.85rem;">📍 Ubicación Mercado: ${data.city} | Sector: ${data.dept_name}</div>
+                </div>
+                <span class="tag green" style="font-size: 0.9rem; padding: 0.4rem 1rem;">${data.diff_str}</span>
+              </div>
+
+              <div class="grid-2" style="margin-top: 1.5rem;">
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid var(--panel-border);">
+                  <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Estimación Mensual en Soles (Perú)</div>
+                  <div style="font-size: 1.5rem; font-weight: 800; color: #6ee7b7; margin: 0.3rem 0;">${data.salary_range_pen.median} / mes</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Banda Estimada: Min ${data.salary_range_pen.min} — Máx ${data.salary_range_pen.max}</div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid var(--panel-border);">
+                  <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Estimación Mensual en Dólares (USD)</div>
+                  <div style="font-size: 1.5rem; font-weight: 800; color: #a5f3fc; margin: 0.3rem 0;">${data.salary_range_usd.median} / mes</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Banda Estimada: Min ${data.salary_range_usd.min} — Máx ${data.salary_range_usd.max}</div>
+                </div>
+              </div>
+
+              <div style="margin-top: 1.25rem; background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); padding: 0.85rem 1rem; border-radius: 8px; color: #c4b5fd; font-size: 0.9rem;">
+                💡 <strong>Consejo de Negociación:</strong> ${data.recommendation}
+              </div>
+            </div>
+          `;
+        } else {
+          resDiv.innerHTML = `<div style="color: #ef4444;">No se encontraron registros salariales para '${comp}'.</div>`;
+        }
+      } catch(e) { console.error(e); }
+    }
+
+    async function generateInterview() {
+      try {
+        const company = document.getElementById('int-company').value;
+        const title = document.getElementById('int-role').value;
+
+        const res = await fetch('/api/interview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ company, title })
+        });
+        const data = await res.json();
+
+        document.getElementById('interview-cards').innerHTML = data.questions.map((q, idx) => `
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="tag cyan">${q.category}</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Desafío #${idx + 1}</span>
+            </div>
+            <div style="font-weight: 700; color: #fff; font-size: 1.05rem; margin-bottom: 1rem;">"${q.question}"</div>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 0.85rem; border-radius: 8px; border: 1px solid var(--panel-border); font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              <strong style="color: var(--accent-cyan);">Guía Estructurada STAR Recomendada:</strong><br>
+              • <b>Situación:</b> ${q.star_guide.Situation}<br>
+              • <b>Tarea:</b> ${q.star_guide.Task}<br>
+              • <b>Acción:</b> ${q.star_guide.Action}<br>
+              • <b>Resultado:</b> ${q.star_guide.Result}
+            </div>
+
+            <div style="border-top: 1px dashed var(--panel-border); padding-top: 0.85rem;">
+              <label style="color: #fff; font-size: 0.85rem;">✍️ Práctica en Vivo: Redacta tu respuesta a esta pregunta</label>
+              <textarea id="user-ans-${idx}" rows="3" placeholder="Escribe aquí tu respuesta para recibir evaluación inmediata de la IA..."></textarea>
+              <button class="btn-primary" style="margin-top: 0.5rem; width: auto; padding: 0.4rem 1rem; font-size: 0.85rem;" onclick="evaluateAnswer(${idx}, '${q.question.replace(/'/g, "\\'")}')">
+                🤖 Evaluar mi Respuesta con IA
+              </button>
+              <div id="ans-eval-result-${idx}" style="margin-top: 0.75rem; display: none;"></div>
+            </div>
+          </div>
+        `).join('');
+      } catch(e) { console.error(e); }
+    }
+
+    async function evaluateAnswer(idx, qText) {
+      const ans = document.getElementById(`user-ans-${idx}`).value;
+      const resBox = document.getElementById(`ans-eval-result-${idx}`);
+      const company = document.getElementById('int-company').value;
+      const title = document.getElementById('int-role').value;
+
+      resBox.style.display = 'block';
+      resBox.innerHTML = `<div style="color: var(--accent-cyan); font-size: 0.85rem;">⏳ Analizando estructura STAR y calidad técnica...</div>`;
+
+      const res = await fetch('/api/evaluate_answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: qText, answer: ans, company, title })
+      });
+      const data = await res.json();
+
+      let scoreColor = data.score >= 8 ? '#10b981' : (data.score >= 6 ? '#f59e0b' : '#ef4444');
+
+      resBox.innerHTML = `
+        <div style="background: rgba(15,23,42,0.9); border: 1px solid var(--panel-border); padding: 1rem; border-radius: 8px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: #fff; font-size: 0.95rem;">${data.verdict}</strong>
+            <span style="background: ${scoreColor}; color: white; padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.9rem;">
+              Calificación: ${data.score} / 10
+            </span>
+          </div>
+
+          <div style="font-size: 0.8rem; color: #6ee7b7; margin-bottom: 0.4rem;">
+            ✅ <strong>Puntos Fuertes:</strong> ${data.strengths.join(' ')}
+          </div>
+          <div style="font-size: 0.8rem; color: #fca5a5; margin-bottom: 0.5rem;">
+            ⚠️ <strong>Aspectos a Mejorar:</strong> ${data.missing_star.join(' | ')}
+          </div>
+
+          <div style="background: rgba(0,0,0,0.4); padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.8rem; color: #a5f3fc;">
+            💡 <strong>Sugerencia de Respuesta Estructurada:</strong><br>${data.improved_response}
+          </div>
+        </div>
+      `;
+    }
+
+    // Initial load calls
+    loadProfile();
+    loadDocuments();
+    runFitEval();
+    runSalaryLookup();
+    generateInterview();
+  </script>
+</body>
+</html>

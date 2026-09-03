@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "source": "Benchmark Salarial Perú & Latam 2026",
+    "index_baseline": 100,
+    "index_label": "Índice de Mercado",
+    "baseline_description": "Índice 100 = Salario mediano de mercado para Desarrollo de Software Senior (S/. 7,500 / mes)"
+  },
+  "companies": [
+    {
+      "company": "Tecsup",
+      "city": "Lima / Arequipa / Trujillo, Perú",
+      "categories": {
+        "all_employees": { "count": 450, "index": 56.0 },
+        "engineering": { "count": 120, "index": 80.0 }
+      }
+    },
+    {
+      "company": "Universidad César Vallejo",
+      "city": "Lima, Perú",
+      "categories": {
+        "all_employees": { "count": 1200, "index": 48.0 },
+        "engineering": { "count": 150, "index": 70.0 }
+      }
+    },
+    {
+      "company": "BairesDev",
+      "city": "Remoto / Latam",
+      "categories": {
+        "all_employees": { "count": 1200, "index": 105.0 },
+        "engineering": { "count": 850, "index": 110.5 }
+      }
+    },
+    {
+      "company": "Canonical",
+      "city": "Remoto / Global",
+      "categories": {
+        "all_employees": { "count": 900, "index": 118.0 },
+        "engineering": { "count": 600, "index": 125.0 }
+      }
+    },
+    {
+      "company": "Google",
+      "city": "Global / Remoto",
+      "categories": {
+        "all_employees": { "count": 5000, "index": 150.0 },
+        "engineering": { "count": 3000, "index": 165.0 }
+      }
+    },
+    {
+      "company": "Microsoft",
+      "city": "Global / Remoto",
+      "categories": {
+        "all_employees": { "count": 4000, "index": 145.0 },
+        "engineering": { "count": 2500, "index": 155.0 }
+      }
+    },
+    {
+      "company": "Globant",
+      "city": "Perú / Latam",
+      "categories": {
+        "all_employees": { "count": 2500, "index": 92.0 },
+        "engineering": { "count": 1800, "index": 105.0 }
+      }
+    }
+  ]
+}
